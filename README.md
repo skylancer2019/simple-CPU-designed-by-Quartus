@@ -1,1 +1,1 @@
-# simple-SPU-designed-by-Quartus
+# simple-CPU-designed-by-Quartus
