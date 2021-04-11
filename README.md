@@ -110,9 +110,9 @@ A2xB1 应为低 8 位，高位补 0；A2xB2 为高 8 位，低位补 0,记相加
 12adder 与 adder16 都是由多个全加器组成。
 
 ### 比较部分
-
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/compare_struct.jpg)
 上图为总体框图中和比较相关的部分。
-
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/compare.jpg)
 上图为比较部分相关的原理图。左边四个 74273 为两个 16 位寄存器 R3 和 R4。四个 7485
 构成了 16 位比较器。16 位比较器的输入为两个 16 位数，输出为 ALB,AEB,AGB。若 ALB 输
 出 0，则 A 小于 B; 若 AEB 输出 0，则 A=B; 若 AGB 输出 0，则 A 大于 B。7485 右侧用
@@ -120,7 +120,7 @@ A2xB1 应为低 8 位，高位补 0；A2xB2 为高 8 位，低位补 0,记相加
 CPSC。
 
 通过 store 控制 PC 置位，实现跳转指令：
-
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/jump.jpg)
 图中最上面的 and2 的输入为 AGB 的结果和跳转指令中的判定条件 A 大于 B 的信号。若二
 者都为 1 则说明满足跳转条件，则 PC 置位。第二个 and2 的输入为 AEB 的结果和跳转指令
 中判定 A 等于 B 的信号，若二者都为 1 则满足跳转条件，PC 置位。第三个 and2 的输入为
@@ -130,23 +130,25 @@ ALB 的结果和跳转指令中的判定条件 A 小于 B 的信号，若二者�
 地址。
 
 ### 内存读写部分
-
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/memory_struct.jpg)
 上图为与内存读写相关的部分。MAR 和 MDR 都有两个输入来源，输入来源的选择用
 选择器实现。MAR 输出到 RAM 中，而 MDR 可以输出到 RAM 也可以输出到总线。本
 模型机使用的 RAM 为 16 x 256，8 为地址，16 位数据。
-
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/memory.jpg)
 上图为内存读写部分的原理图。MAR 通过 8choser 完成对 PC 和总线的选择，输出连接
 RAM 的 address 端。MDR 用 16choser 选择 RAM 或总线，输出连接 RAM 的 data 端和写入
 总线选择器 Choser6。
 
 ### 其他部分
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/others.jpg)
 右上角的两个 74161 是 PC，两个 74161 的 ABCD 都连接到总线上，CLRN 与 clear 信号相
 连，LDN 置位端连接上文所述的比较部分。为了让 PC 的 CLK 足够宽，用左下角的 74161
 使得该 74161 的 QA 比系统时钟更宽。
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/map.jpg)
 
 ## 微程序实现的控制部件CU
 ### CU总体框图
-
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/cu_struct.jpg)
 IR 存储当前指令，IR 的高六位操作码和 uIR 的低 10 位作为微地址形成电路的地址来
 源。若微地址由 IR 生成，则生成的 10 位微地址高六位为操作码，低四位为 0；该微地
 址是指令对应的微程序的入口地址。微地址也可以直接由 uIR 的低 10 位直接给出。
@@ -160,20 +162,23 @@ CP 脉冲。同时 CP 脉冲也可以直接由 uIR 中对应的三位译码产�
 寄存器内容写入总线，产生对应的写入总线信号。写入总线信号也可以由 uIR 对应的
 三位经译码后产生。
 微指令格式如下：
-
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/microinstruction.jpg)
 ### 每个部件原理图
 #### IR原理图
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/IR.jpg)
 IR 为两个 74273 组成的 16 位寄存器。其输入与
 16 位总线相连。高六位输出连接微地址形成电
 路。低 8 位中和寄存器相关的六位与 uIR 中对应的
 六位会对信号产生共同影响。
 #### 微地址形成电路,CROM,uPC原理图
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/crom_uPC.jpg)
 上图中 16choser 为微地址形成电路，其中 A 输入的高六位连接 IR 的高六位，低四位
 补 0；B 的 10 位输入连接 uIR 的低 10 位。依靠 Achoser 和 Bchoser 线对两种方式进行选择。uPC 由 3 个 74161 组成，生成 10 位地址。其低 10 位输入为 16choser 的 10 位
 输出。CROM 为 32x1024 的控制寄存器。CROM 与 uPC 的 clock 直接与系统时钟相
 连。
 
 #### uIR原理图
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/uIR.jpg)
 uIR 由 4 片 74273 组成，uIR 的输入为 CROM 的 32 位输出端 q[31..0]。uIR 不少输出都需要
 经译码器译码后才能产生对应的信号。图中与 or 相关的译码器即为上述的与通用寄存器打
 入脉冲相关的译码器和与写入总线入口选择有关的译码器。
@@ -255,3 +260,6 @@ MULTI             1f0
 HALT              200
 
 CROM内部如下图所示：
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/CROM1.jpg)
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/CROM2.jpg)
+![image](https://github.com/skylancer2019/simple-CPU-designed-by-Quartus/blob/main/pic/CROM3.jpg)
