@@ -1,4 +1,4 @@
-# simple-CPU-designed-by-Quartus
+# simple-CPU-designed-by-Quartus（详见"设计报告")
 ## 实现的指令
 ### 指令组
 
